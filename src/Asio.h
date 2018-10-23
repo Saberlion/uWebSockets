@@ -3,7 +3,7 @@
 
 #include <boost/asio.hpp>
 
-typedef boost::asio::ip::tcp::socket::native_handle_type uv_os_sock_t;
+typedef SOCKET uv_os_sock_t;
 static const int UV_READABLE = 1;
 static const int UV_WRITABLE = 2;
 
@@ -106,11 +106,11 @@ struct Async {
 };
 
 struct Poll {
-    boost::asio::posix::stream_descriptor *socket;
+    boost::asio::ip::tcp::socket *socket;
     void (*cb)(Poll *p, int status, int events);
 
     Poll(Loop *loop, uv_os_sock_t fd) {
-        socket = new boost::asio::posix::stream_descriptor(*loop, fd);
+		socket = new boost::asio::ip::tcp::socket(*loop, boost::asio::ip::tcp::v4(), fd);
         socket->non_blocking(true);
     }
 
@@ -132,7 +132,7 @@ struct Poll {
 
     void reInit(Loop *loop, uv_os_sock_t fd) {
         delete socket;
-        socket = new boost::asio::posix::stream_descriptor(*loop, fd);
+		socket = new boost::asio::ip::tcp::socket(*loop, boost::asio::ip::tcp::v4(), fd);
         socket->non_blocking(true);
     }
 
